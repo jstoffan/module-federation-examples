@@ -1,5 +1,6 @@
 import React from "react";
 import moment from "moment";
+import ButtonRemote from 'app2/Button';
 
 export default function Widget() {
   return (
@@ -13,9 +14,12 @@ export default function Widget() {
     >
       <h2>App 1 Widget</h2>
       <p>
-        Moment shouldn't download twice, the host has no moment.js <br />{" "}
         {moment().format("MMMM Do YYYY, h:mm:ss a")}
       </p>
+
+      <React.Suspense fallback="Loading widget">
+          <ButtonRemote />
+      </React.Suspense>
     </div>
   );
 }

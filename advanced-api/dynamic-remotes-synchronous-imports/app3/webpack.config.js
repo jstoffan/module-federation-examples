@@ -1,14 +1,13 @@
-const ExternalTemplateRemotesPlugin = require("./ExternalTemplateRemotesPlugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const { ModuleFederationPlugin } = require("webpack").container;
+const ModuleFederationPlugin =
+  require("webpack").container.ModuleFederationPlugin;
 const fs = require("fs");
 const path = require("path");
 const deps = require("./package.json").dependencies;
 
 module.exports = {
-  entry: ["./src/index"],
+  entry: "./src/index",
   mode: "development",
-  target: "web",
   devServer: {
     contentBase: path.join(__dirname, "dist"),
     headers: {
@@ -20,8 +19,9 @@ module.exports = {
       cert: fs.readFileSync("/Users/jstoffan/Desktop/Certs/localhost.pem"),
       key: fs.readFileSync("/Users/jstoffan/Desktop/Certs/localhost-key.pem"),
     },
-    port: 3001,
+    port: 3003,
   },
+  target: "web",
   output: {
     publicPath: "auto",
   },
@@ -39,16 +39,18 @@ module.exports = {
   },
   plugins: [
     new ModuleFederationPlugin({
-      name: "app1",
-      filename: "app1.js",
+      name: "app3",
+      library: { type: "var", name: "app3" },
+      filename: "app3.js",
       exposes: {
+        "./Button": "./src/Button",
         "./Widget": "./src/Widget",
       },
-      remotes: {
-        app2: "app2@[window.Box.webpackRemotes.app2]/app2.js",
-      },
+      // adds react as shared module
+      // version is inferred from package.json
+      // there is no version check for the required version
+      // so it will always use the higher version found
       shared: {
-        moment: deps.moment,
         react: {
           requiredVersion: deps.react,
           import: "react", // the "react" package will be used a provided and fallback module
@@ -60,9 +62,12 @@ module.exports = {
           requiredVersion: deps["react-dom"],
           singleton: true, // only a single version of the shared module is allowed
         },
+        // adds moment as shared module
+        // version is inferred from package.json
+        // it will use the highest moment version that is >= 2.24 and < 3
+        moment: deps.moment,
       },
     }),
-    new ExternalTemplateRemotesPlugin(),
     new HtmlWebpackPlugin({
       template: "./public/index.html",
     }),

@@ -1,8 +1,8 @@
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const ModuleFederationPlugin =
   require("webpack").container.ModuleFederationPlugin;
+const fs = require("fs");
 const path = require("path");
-const { app2Module } = require("../moduleConfig");
 const deps = require("./package.json").dependencies;
 
 module.exports = {
@@ -10,7 +10,16 @@ module.exports = {
   mode: "development",
   devServer: {
     contentBase: path.join(__dirname, "dist"),
-    port: app2Module.port,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+      "Access-Control-Allow-Headers": "X-Requested-With, content-type, Authorization"
+    },
+    https: {
+      cert: fs.readFileSync("/Users/jstoffan/Desktop/Certs/localhost.pem"),
+      key: fs.readFileSync("/Users/jstoffan/Desktop/Certs/localhost-key.pem"),
+    },
+    port: 3002,
   },
   target: "web",
   output: {
@@ -30,10 +39,11 @@ module.exports = {
   },
   plugins: [
     new ModuleFederationPlugin({
-      name: app2Module.name,
-      library: { type: "var", name: app2Module.name },
-      filename: app2Module.fileName,
+      name: "app2",
+      library: { type: "var", name: "app2" },
+      filename: "app2.js",
       exposes: {
+        "./Button": "./src/Button",
         "./Widget": "./src/Widget",
       },
       // adds react as shared module

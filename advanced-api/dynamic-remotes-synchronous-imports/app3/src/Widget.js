@@ -7,11 +7,11 @@ export default function Widget() {
       style={{
         borderRadius: "4px",
         padding: "2em",
-        backgroundColor: "purple",
+        backgroundColor: "blue",
         color: "white",
       }}
     >
-      <h2>App 2 Widget</h2>
+      <h2>App 3 Widget</h2>
       <p>{moment().format("MMMM Do YYYY, h:mm:ss a")}</p>
     </div>
   );
